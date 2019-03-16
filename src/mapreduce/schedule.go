@@ -40,6 +40,10 @@ func schedule(jobName string, mapFiles []string, nReduce int, phase jobPhase, re
 	// 3. send worker to `registerChan` after job is finished
 	// 4. use a sync.WaitGroup to wait for all tasks done
 
+	// For handling worker's failure
+	// 1. check result for the RPC call, keep running until succeed
+	// 2. if a worker fails, do not send it back to `registerChan`
+
 	var wg sync.WaitGroup
 	wg.Add(ntasks)
 
@@ -53,14 +57,18 @@ func schedule(jobName string, mapFiles []string, nReduce int, phase jobPhase, re
 		taskNumber := i
 
 		go func() {
-			worker := <-registerChan // blocked until there is a available worker
-			taskArgs := DoTaskArgs{
-				JobName:       jobName,
-				File:          mapFile,
-				Phase:         phase,
-				TaskNumber:    taskNumber,
-				NumOtherPhase: n_other}
-			call(worker, "Worker.DoTask", taskArgs, new(struct{}))
+			ok := false
+			var worker string
+			for !ok {
+				worker = <-registerChan // blocked until there is a available worker
+				taskArgs := DoTaskArgs{
+					JobName:       jobName,
+					File:          mapFile,
+					Phase:         phase,
+					TaskNumber:    taskNumber,
+					NumOtherPhase: n_other}
+				ok = call(worker, "Worker.DoTask", taskArgs, new(struct{}))
+			}
 			go func() { registerChan <- worker }() // otherwise this instruction may be blocked
 			wg.Done()
 		}()
