@@ -54,9 +54,8 @@ func schedule(jobName string, mapFiles []string, nReduce int, phase jobPhase, re
 		if phase == mapPhase {
 			mapFile = mapFiles[i]
 		}
-		taskNumber := i
 
-		go func() {
+		go func(mapFile string, taskNumber int) {
 			ok := false
 			var worker string
 			for !ok {
@@ -71,7 +70,7 @@ func schedule(jobName string, mapFiles []string, nReduce int, phase jobPhase, re
 			}
 			go func() { registerChan <- worker }() // otherwise this instruction may be blocked
 			wg.Done()
-		}()
+		}(mapFile, i)
 	}
 
 	wg.Wait()
