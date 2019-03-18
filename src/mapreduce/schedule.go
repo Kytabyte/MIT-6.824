@@ -59,7 +59,7 @@ func schedule(jobName string, mapFiles []string, nReduce int, phase jobPhase, re
 			ok := false
 			var worker string
 			for !ok {
-				worker = <-registerChan // blocked until there is a available worker
+				worker = <-registerChan // blocked until there is an available worker
 				taskArgs := DoTaskArgs{
 					JobName:       jobName,
 					File:          mapFile,
