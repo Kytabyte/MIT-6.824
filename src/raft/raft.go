@@ -281,7 +281,7 @@ func (rf *Raft) doSendAppendEntries(server int, args *AppendEntryArgs, reply *Ap
 }
 
 func (rf *Raft) sendHeartbeat() {
-	for i, _ := range rf.peers {
+	for i := range rf.peers {
 		if i == rf.me {
 			continue
 		}
