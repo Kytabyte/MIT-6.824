@@ -99,7 +99,7 @@ func (rf *Raft) GetState() (int, bool) {
 
 	term = rf.currentTerm
 	isleader = (rf.state == leader)
-	
+
 	return term, isleader
 }
 
@@ -173,7 +173,7 @@ func (rf *Raft) RequestVote(args *RequestVoteArgs, reply *RequestVoteReply) {
 		reply.Term = rf.currentTerm
 		reply.VoteGranted = true
 
-		go func() {rf.requestVoteCh <- 1}()
+		go func() { rf.requestVoteCh <- 1 }()
 	}
 }
 
@@ -231,7 +231,7 @@ func (rf *Raft) sendRequestVote(successCh chan bool) {
 			if reply.VoteGranted {
 				mu.Lock()
 				agree++
-				if agree == len(rf.peers) / 2 {
+				if agree == len(rf.peers)/2 {
 					go func() { close(successCh) }()
 				}
 				mu.Unlock()
@@ -270,7 +270,7 @@ func (rf *Raft) AppendEntries(args *AppendEntryArgs, reply *AppendEntryReply) {
 
 		rf.currentTerm = reply.Term
 		if len(args.Entries) == 0 {
-			go func() {rf.heartbeatCh <- 1}()
+			go func() { rf.heartbeatCh <- 1 }()
 		}
 	}
 }
