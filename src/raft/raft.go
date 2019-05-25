@@ -215,7 +215,7 @@ func (rf *Raft) sendRequestVote(successCh chan bool) {
 	var agree int
 	var mu sync.Mutex
 
-	for i, _ := range rf.peers {
+	for i := range rf.peers {
 		if i == rf.me {
 			continue
 		}
